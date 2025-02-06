@@ -90,6 +90,43 @@ defmodule MsgpaxTest do
     assert_format build_map(0x10000), <<223, 0x10000::32>>
   end
 
+  test "big nested map" do
+    input = %{
+      "user" => %{
+        "name" => "John",
+        "settings" => %{
+          "theme" => "dark",
+          42 => "meaning",
+          :already_atom => true,
+          "nested" => %{
+            "deep" => "value",
+            123 => "number",
+            "array" => ["one", %{"key" => "value"}]
+          }
+        }
+      }
+    }
+
+    expected = %{
+      user: %{
+        name: "John",
+        settings: %{
+          :theme => "dark",
+          42 => "meaning",
+          :already_atom => true,
+          :nested => %{
+            :deep => "value",
+            123 => "number",
+            :array => ["one", %{key: "value"}]
+          }
+        }
+      }
+    }
+
+    {:ok, packed} = Msgpax.pack(input)
+    assert {:ok, ^expected} = Msgpax.unpack(packed)
+  end
+
   test "booleans" do
     assert_format false, <<194>>
     assert_format true, <<195>>
@@ -188,7 +225,7 @@ defmodule MsgpaxTest do
 
   test "fragment" do
     assert {:ok, %Msgpax.Fragment{} = fragment} = Msgpax.pack_fragment("bar", iodata: false)
-    assert Msgpax.pack!(%{foo: fragment}) |> Msgpax.unpack!() == %{"foo" => "bar"}
+    assert Msgpax.pack!(%{foo: fragment}) |> Msgpax.unpack!() == %{foo: "bar"}
 
     assert %Msgpax.Fragment{} = fragment = Msgpax.pack_fragment!("foo")
     assert Msgpax.pack!([false, fragment]) |> Msgpax.unpack!() == [false, "foo"]

@@ -250,7 +250,13 @@ defmodule Msgpax.Unpacker do
   end
 
   defp build_map(result, pairs, 0) do
-    [:maps.from_list(pairs) | result]
+    converted =
+      Enum.map(pairs, fn
+        {key, value} when is_binary(key) -> {String.to_atom(key), value}
+        pair -> pair
+      end)
+
+    [:maps.from_list(converted) | result]
   end
 
   defp build_map([value, key | rest], pairs, count) do

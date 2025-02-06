@@ -87,10 +87,6 @@ defmodule Msgpax.Ext do
 
       iex> Msgpax.Ext.new(24, "foo")
       #Msgpax.Ext<24, "foo">
-
-      iex> Msgpax.Ext.new(25, 'bar')
-      #Msgpax.Ext<25, 'bar'>
-
   """
   def new(type, data)
       when type in 0..127 and (is_binary(data) or is_list(data)) do

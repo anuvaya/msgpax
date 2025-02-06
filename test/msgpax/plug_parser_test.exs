@@ -5,7 +5,7 @@ defmodule Msgpax.PlugParserTest do
   test "body with a MessagePack-encoded map" do
     conn = conn(:post, "/", Msgpax.pack!(%{hello: "world"}, iodata: false))
 
-    assert {:ok, %{"hello" => "world"}, _conn} = parse(conn, [])
+    assert {:ok, %{hello: "world"}, _conn} = parse(conn, [])
   end
 
   test "body with a MessagePack-encoded non-map term" do
